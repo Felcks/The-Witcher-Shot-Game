@@ -20,7 +20,7 @@
 
 #define SCREEN_WIDTH 800   
 #define SCREEN_HEIGHT  600
-#define GAME_TITLE "JOGO DE TIRO"
+#define GAME_TITLE "The Witcher 3 - Wild Hunt"
 #define SCREEN_FPS  60
 #define SCREEN_TICKS_PER_FRAME 1000 / SCREEN_FPS
 
@@ -54,13 +54,13 @@ SDL_Rect doorDownRect;
 SDL_Rect blackDownRect;
 
 
-
-
 SDL_Texture* logoTexutre = NULL;
 SDL_Texture* fadeTexture = NULL;
 Uint8 alpha = 255;
 int fadeInDone = 0;
 int fadeOutDone = 0;
+
+int hasKey = 0;
 
 void CreateComponents();
 void CreateFont();
@@ -190,16 +190,10 @@ int main(void)
     blackDownRect.x = SCREEN_WIDTH/2  - 70;
     blackDownRect.y = SCREEN_HEIGHT - 78;
 
-
-
-
-    //int w, h;
-    //SDL_GetWindowSize(window, &w, &h);
-
-    backgroundTexture = loadTexture("Sprites/MENU1.png");
+    backgroundTexture = loadTexture("Sprites/Background0.jpg");
     borderTexture = loadTexture("Sprites/Border_Purple.png");
     fadeTexture = loadTexture("Sprites/Fade.png");
-    logoTexutre = loadTexture("Sprites/Logo.jpg");
+    logoTexutre = loadTexture("Sprites/Logo.png");
     keyTexture = loadTexture("Sprites/Key.png");
     
     doorLeftTexture = loadTexture("Sprites/Doors/DoorLeft_0.png");
@@ -214,8 +208,6 @@ int main(void)
 	while(quit == 0)
     {
         currentTicks = SDL_GetTicks();
-
-
        // printf("%i\n",(currentTicks - startTicks) );
 
 
@@ -223,7 +215,6 @@ int main(void)
         int frameTicks = ((currentTicks - startTicks) / 1000);
         if( frameTicks > SCREEN_TICKS_PER_FRAME )
         {
-            //printf("bb\n");
             //Wait remaining time
             SDL_Delay( frameTicks - SCREEN_TICKS_PER_FRAME );
             startTicks = SDL_GetTicks();
@@ -299,12 +290,12 @@ void DrawIntro()
     SDL_RenderCopy( window.renderer, fadeTexture, NULL, NULL );
     
     if(fadeInDone == 0)
-        fadeInDone = FadeIn(&alpha);
+        fadeInaone = FadeIn(&alpha);
     else
         fadeOutDone = FadeOut(&alpha);
         
     if(fadeOutDone == 1){
-        scene = MENU;
+        scene = GAME;
         fadeInDone = 0;
         fadeOutDone = 0;
     }
@@ -314,7 +305,7 @@ void DrawMenu()
 {
     //Draw Background
     SDL_RenderCopy( window.renderer, backgroundTexture, NULL, NULL );
-    //Draw BlackSquares
+    //Draw BlackSquaresa
     SDL_RenderCopy( window.renderer, fadeTexture, NULL, &blackLeftRect );
     SDL_RenderCopy( window.renderer, fadeTexture, NULL, &blackRightRect );
     SDL_RenderCopy( window.renderer, fadeTexture, NULL, &blackUpRect );
@@ -343,7 +334,20 @@ void DrawGame()
         SDL_RenderCopy( window.renderer, backgroundTexture, NULL, NULL );
 
         //SDL_RenderCopy( window.renderer, backgroundTexture, NULL, NULL );
-        
+        //Draw BlackSquares
+        SDL_RenderCopy( window.renderer, fadeTexture, NULL, &blackLeftRect );
+        SDL_RenderCopy( window.renderer, fadeTexture, NULL, &blackRightRect );
+        SDL_RenderCopy( window.renderer, fadeTexture, NULL, &blackUpRect );
+        SDL_RenderCopy( window.renderer, fadeTexture, NULL, &blackDownRect );
+        //Draw Door
+        SDL_RenderCopy( window.renderer, doorLeftTexture, NULL, &doorLeftRect );
+        SDL_RenderCopy( window.renderer, doorRightTexture, NULL, &doorRightRect );
+        SDL_RenderCopy( window.renderer, doorUpTexture, NULL, &doorUpRect );
+        SDL_RenderCopy( window.renderer, doorDownTexture, NULL, &doorDownRect );
+            
+        //Draw Border
+        SDL_RenderCopy( window.renderer, borderTexture, NULL, NULL );
+
         //Draw Enemies
         for( j=0; j<arrayEnemy.length; j++)
              SDL_RenderCopyEx( window.renderer, arrayEnemy.vetor[j].texture, &arrayEnemy.vetor[j].imageRect, &arrayEnemy.vetor[j].rect, 0, NULL, SDL_FLIP_NONE);
@@ -397,6 +401,7 @@ void Draw()
 void TakeKey(){
     if(Collision_Rect_Rect(player.rect, keyRect) == 1){
         keyRect.x = 999;
+        arrayShot.defaultShotTexture = keyTexture;
     }
 }
 
@@ -636,8 +641,6 @@ void RemoveAt_Enemy(ARRAYENEMY *arrayEnemy, int pos)
 int posVector[24];
 void CreateRound(){
 
-
-
     for(i = 0; i< 24 ; i++)
         posVector[i] = 0;
 
@@ -687,12 +690,9 @@ void CreateRound(){
         
          }
 
-    }
-
-    
-    
-    
+    } 
 }
+
 void GameOver()
 {
     if(player.hp <= 0){
@@ -999,7 +999,7 @@ void CreateComponents(){
     player.lifeRect.x = player.rect.x + 5;
     player.lifeRect.y = player.rect.y - 10;
     player.lifeRect.w = player.hp;
-    player.lifeRect.h = 10;
+    player.lifeRect.h = 5;
     player.vulnerable = 1;
     player.minToVulnerable = 50;
     player.countVulnerable = 0;
@@ -1027,9 +1027,9 @@ void CreateComponents(){
     player.lifeRectBG.x = player.rect.x + 5;
     player.lifeRectBG.y = player.rect.y - 10;
     player.lifeRectBG.w = 35;
-    player.lifeRectBG.h = 10;
+    player.lifeRectBG.h = 5;
 
-    arrayShot.defaultShotSize = 20;
+    arrayShot.defaultShotSize = 10;
     arrayShot.defaultShotSpeed = 2;
     arrayShot.defaultShotTexture = loadTexture("Sprites/Shot.png");
     arrayShot.length = 0;
